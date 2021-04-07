@@ -15,7 +15,7 @@ function App(): React.ReactElement {
       status: 'In Progress',
       date: new Date('2020-01-16'),
     },
-    { id: 3, task: 'Todo 3', status: 'Complete', date: new Date() },
+    { id: 3, task: 'Todo 3', status: 'Paused', date: new Date() },
     { id: 4, task: 'Todo 4', status: 'Complete', date: new Date() },
   ];
 
