@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import uuid from 'uuid';
 import AddTask from './components/AddTask';
+import Item from './components/Item';
 
 const initialState: Array<{
   id: string;
@@ -42,24 +43,18 @@ function App(): React.ReactElement {
     setTask(event.target.value);
   }
 
+  function handleDelete(taskId: string): void {
+    const newList = list.filter((i) => i.id !== taskId);
+
+    setList(newList);
+  }
+
   return (
     <div className="App">
       <AddTask task={task} onChange={handleChange} onAdd={handleAdd} />
-      {/* <form onSubmit={handleAdd}>
-        <input
-          type="text"
-          style={{ border: '2px solid gray' }}
-          value={task}
-          onChange={handleChange}
-          required
-        />
-        <input type="submit" value="Add Task" />
-      </form> */}
       <ul>
         {list.map((item) => (
-          <li key={item.id}>
-            {item.id} {item.task} {item.status} {item.date.getTime()}
-          </li>
+          <Item key={item.id} item={item} onDelete={handleDelete} />
         ))}
       </ul>
     </div>
