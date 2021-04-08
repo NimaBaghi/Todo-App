@@ -1,38 +1,58 @@
 import React from 'react';
 import './App.css';
 import uuid from 'uuid';
-import AddTask from './components/AddTask';
-import Item from './components/Item';
+import TodoTasks from './components/TodoTasks';
+import DoneTasks from './components/DoneTasks';
 
-const initialState: Array<{
+export type ItemType = {
   id: string;
   task: string;
   status: string;
   date: Date;
-}> = [
-  { id: '1', task: 'Todo 1', status: 'Complete', date: new Date() },
+  done: boolean;
+};
+
+const initialState: Array<ItemType> = [
+  {
+    id: '1',
+    task: 'Todo 1',
+    status: 'Complete',
+    date: new Date(),
+    done: false,
+  },
   {
     id: '2',
     task: 'Todo 2',
     status: 'In Progress',
     date: new Date('2020-01-16'),
+    done: false,
   },
-  { id: '3', task: 'Todo 3', status: 'Paused', date: new Date() },
-  { id: '4', task: 'Todo 4', status: 'Complete', date: new Date() },
+  { id: '3', task: 'Todo 3', status: 'Paused', date: new Date(), done: true },
+  {
+    id: '4',
+    task: 'Todo 4',
+    status: 'Complete',
+    date: new Date(),
+    done: false,
+  },
 ];
 
 function App(): React.ReactElement {
   const [list, setList] = React.useState(initialState);
   const [task, setTask] = React.useState('');
 
-  function handleAdd(event: React.FormEvent): void {
+  function handleAdd(event: React.FormEvent, item: string): void {
     event.preventDefault();
-    const newList = list.concat({
-      id: uuid.v4(),
-      task,
-      status: 'In Progress',
-      date: new Date(),
-    });
+    const newList = [
+      ...list,
+      {
+        id: uuid.v4(),
+        task: item,
+        status: 'In Progress',
+        date: new Date(),
+        done: false,
+      },
+    ];
 
     setList(newList);
 
@@ -49,14 +69,26 @@ function App(): React.ReactElement {
     setList(newList);
   }
 
+  function handleDone(item: ItemType): void {
+    const newList = [...list];
+    const index = newList.indexOf(item);
+    newList[index] = { ...item };
+    newList[index].done = true;
+    setList(newList);
+  }
+
   return (
     <div className="App">
-      <AddTask task={task} onChange={handleChange} onAdd={handleAdd} />
-      <ul>
-        {list.map((item) => (
-          <Item key={item.id} item={item} onDelete={handleDelete} />
-        ))}
-      </ul>
+      <TodoTasks
+        todotasks={list}
+        onAdd={handleAdd}
+        onDelete={handleDelete}
+        onChange={handleChange}
+        onDone={handleDone}
+        task={task}
+      />
+      <hr className="mt-5 mb-5" />
+      <DoneTasks donetasks={list.filter((i) => i.done === true)} />
     </div>
   );
 }
