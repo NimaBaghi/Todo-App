@@ -12,6 +12,9 @@ export type ItemType = {
   done: boolean;
 };
 
+let isSorted = false;
+const initialSortButtonText = 'Sort';
+
 const initialState: Array<ItemType> = [
   {
     id: '1',
@@ -40,6 +43,7 @@ const initialState: Array<ItemType> = [
 function App(): React.ReactElement {
   const [list, setList] = React.useState(initialState);
   const [task, setTask] = React.useState('');
+  const [sortButtonName, setSortButton] = React.useState(initialSortButtonText);
 
   function handleAdd(event: React.FormEvent, item: string): void {
     event.preventDefault();
@@ -77,8 +81,47 @@ function App(): React.ReactElement {
     setList(newList);
   }
 
+  function compare(a: ItemType, b: ItemType): number {
+    if (a.task < b.task) {
+      return -1;
+    }
+    if (a.task > b.task) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function reverseCompare(a: ItemType, b: ItemType): number {
+    if (a.task < b.task) {
+      return 1;
+    }
+    if (a.task > b.task) {
+      return -1;
+    }
+    return 0;
+  }
+
+  function sortList(): void {
+    const newlist = [...list];
+    let newSortButtonName = 'Sort';
+    if (!isSorted) {
+      newlist.sort(compare);
+      isSorted = true;
+      newSortButtonName = 'A->Z';
+    } else {
+      newlist.sort(reverseCompare);
+      isSorted = false;
+      newSortButtonName = 'Z->A';
+    }
+    setSortButton(newSortButtonName);
+    setList(newlist);
+  }
+
   return (
     <div className="App">
+      <button type="button" className="m-5 bg-gray-600" onClick={sortList}>
+        {sortButtonName}
+      </button>
       <TodoTasks
         todotasks={list}
         onAdd={handleAdd}
