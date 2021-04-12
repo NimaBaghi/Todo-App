@@ -1,7 +1,5 @@
-// import DatePicker from 'react-datepicker';
 import React from 'react';
 import type { ItemType } from '../App';
-// import 'react-datepicker/dist/react-datepicker.css';
 
 interface OptionalHandlers {
   item: ItemType;
@@ -19,7 +17,6 @@ function Item({
   onDelete,
   onDone,
 }: OptionalHandlers): React.ReactElement {
-  // const [startDate, setStartDate] = useState(item.date);
   const monthNames = [
     'January',
     'February',
@@ -41,19 +38,10 @@ function Item({
     item.date.getHours() > 12 ? 'pm' : 'am'
   }`;
 
-  // function openDatePicker(): React.ReactElement {
-  //   return (
-  //     <DatePicker
-  //       selected={startDate}
-  //       onChange={(date: Date): void => setStartDate(date)}
-  //     />
-  //   );
-  // }
-
   function getStatusClasses(): string {
-    let classes = 'p-2 rounded-xl bg-';
+    let classes = 'text-white font-bold p-2 rounded-xl bg-';
     if (item.status === 'In Progress') {
-      classes += 'blue-400';
+      classes += 'blue-500';
     } else if (item.status === 'Paused') {
       classes += 'yellow-500';
     } else {
@@ -64,26 +52,18 @@ function Item({
 
   if (onDelete && onDone) {
     return (
-      <tr className="pt-8 border border-gray-200">
+      <tr className="h-24 pt-8 border-b border-gray-200">
         <td className="col-span-2 text-2xl leading-loose text-left text-gray-900">
           {item.task}{' '}
         </td>
         <td className="text-left">
           <span className={getStatusClasses()}>{item.status}</span>
         </td>
-        <td className="text-left">
-          <button
-            type="button"
-            className="outline-none"
-            // onClick={openDatePicker}
-          >
-            {itemDate}
-          </button>
-        </td>
+        <td className="text-left">{itemDate}</td>
         <td className="text-left">{itemTime}</td>
         <td className="text-left border-none">
           <button
-            className="h-10 px-5 m-2 rounded-full focus:shadow-outline hover:bg-red-100"
+            className="h-10 px-5 m-2 rounded-full focus:shadow-outline hover:bg-red-100 focus:outline-none"
             type="button"
             onClick={(): void => onDelete(item.id)}
           >
@@ -97,7 +77,7 @@ function Item({
             </svg>
           </button>
           <button
-            className="h-10 px-5 m-2 rounded-full focus:shadow-outline hover:bg-green-100"
+            className="h-10 px-5 m-2 rounded-full focus:shadow-outline hover:bg-green-100 focus:outline-none"
             type="button"
             onClick={(): void => onDone(item)}
           >
@@ -116,7 +96,7 @@ function Item({
   }
 
   return (
-    <tr>
+    <tr className="h-24 border border-gray-200">
       <td className="mt-6 text-2xl leading-loose text-left text-gray-900">
         {item.task}
       </td>

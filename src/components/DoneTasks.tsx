@@ -10,7 +10,7 @@ function DoneTasks({
   return (
     <div className="mt-5">
       <table className="w-full ml-auto table-fixed">
-        <tr>
+        <tr className="h-10 border border-gray-200">
           <th className="w-2/6 font-normal text-left text-gray-500">Tasks</th>
           <th className="w-1/6 font-normal text-left text-gray-500">Status</th>
           <th className="w-2/6 font-normal text-left text-gray-500">Date</th>

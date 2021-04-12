@@ -15,13 +15,29 @@ function AddTask({
     <Popup
       trigger={
         <button
-          className="h-10 px-5 m-2 text-blue-100 bg-blue-600 rounded-lg focus:shadow-outline hover:bg-blue-700"
+          className="relative h-10 m-2 text-blue-100 bg-blue-600 rounded-md focus:shadow-outline focus:outline-none hover:bg-blue-700"
           type="button"
         >
-          Add Task
+          <div className="absolute inset-y-0 flex items-center w-6 h-full">
+            <svg
+              className="w-6 h-6 "
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              />
+            </svg>
+          </div>
+          <span className="pl-6 pr-2">Add Task</span>
         </button>
       }
-      position="right center"
+      position="bottom center"
     >
       <div className="inline-block text-left align-bottom bg-white rounded-lg shadow-xl sm:align-middle sm:max-w-lg">
         <div className="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
