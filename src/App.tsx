@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import uuid from 'uuid';
 import TodoTasks from './components/TodoTasks';
 import DoneTasks from './components/DoneTasks';
@@ -13,7 +13,6 @@ export type ItemType = {
 };
 
 let isSorted = false;
-const initialSortButtonText = 'Sort';
 
 const initialState: Array<ItemType> = [
   {
@@ -57,10 +56,43 @@ const initialState: Array<ItemType> = [
 function App(): React.ReactElement {
   const [list, setList] = useState(initialState);
   const [task, setTask] = useState('');
-  const [sortButtonName, setSortButton] = useState(initialSortButtonText);
   const [currentPage, setCurrentPage] = useState('Todo');
   const [filterDate, setFilterDate] = useState('');
   const [filterList, setFilterList] = useState(initialState);
+
+  useEffect(() => {
+    const storedList = localStorage.getItem('taskList');
+    const initList = storedList ? JSON.parse(storedList) : initialState;
+    for (let i = 0; i < initList.length; i += 1) {
+      initList[i].date = new Date(initList[i].date);
+    }
+    setList(initList);
+    setFilterList(initList);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('taskList', JSON.stringify(list));
+  }, [list]);
+
+  function handleEdit(
+    event: React.FormEvent,
+    item: ItemType,
+    newTaskName: string,
+  ): void {
+    event.preventDefault();
+
+    const newList = [...filterList];
+    const filterListIndex = newList.indexOf(item);
+    newList[filterListIndex] = { ...item };
+    newList[filterListIndex].task = newTaskName;
+    setFilterList(newList);
+
+    const newOriginalList = [...list];
+    const originalListIndex = newOriginalList.indexOf(item);
+    newOriginalList[originalListIndex] = { ...item };
+    newOriginalList[originalListIndex].task = newTaskName;
+    setList(newOriginalList);
+  }
 
   function handleAdd(event: React.FormEvent, item: string): void {
     event.preventDefault();
@@ -140,19 +172,15 @@ function App(): React.ReactElement {
     return 0;
   }
 
-  function sortList(): void {
+  function handleSort(): void {
     const newlist = [...filterList];
-    let newSortButtonName = 'Sort';
     if (!isSorted) {
       newlist.sort(compare);
       isSorted = true;
-      newSortButtonName = 'A->Z';
     } else {
       newlist.sort(reverseCompare);
       isSorted = false;
-      newSortButtonName = 'Z->A';
     }
-    setSortButton(newSortButtonName);
     setFilterList(newlist);
   }
 
@@ -220,15 +248,8 @@ function App(): React.ReactElement {
         </button>
         <hr />
       </div>
-      <button
-        type="button"
-        className="h-10 px-5 m-auto mt-3 text-gray-100 bg-gray-700 rounded-lg focus:outline-none hover:bg-gray-800"
-        onClick={sortList}
-      >
-        {sortButtonName}
-      </button>
 
-      <div className="h-full p-4">
+      <div className="h-full p-4 my-5">
         <div className="flex justify-end">
           <div className="flex rounded-md shadow-sm">
             <button
@@ -274,9 +295,14 @@ function App(): React.ReactElement {
             todotasks={filterList}
             onDelete={handleDelete}
             onDone={handleDone}
+            onSort={handleSort}
+            onEdit={handleEdit}
           />
         ) : (
-          <DoneTasks donetasks={filterList.filter((i) => i.done === true)} />
+          <DoneTasks
+            donetasks={filterList.filter((i) => i.done === true)}
+            onSort={handleSort}
+          />
         )}
       </div>
     </div>
