@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import uuid from 'uuid';
 import TodoTasks from './components/TodoTasks';
 import DoneTasks from './components/DoneTasks';
@@ -11,8 +11,6 @@ export type ItemType = {
   date: Date;
   done: boolean;
 };
-
-let isSorted = false;
 
 const initialState: Array<ItemType> = [
   {
@@ -59,6 +57,7 @@ function App(): React.ReactElement {
   const [currentPage, setCurrentPage] = useState('Todo');
   const [filterDate, setFilterDate] = useState('');
   const [filterList, setFilterList] = useState(initialState);
+  const [isSorted, setSorted] = useState(false);
 
   useEffect(() => {
     const storedList = localStorage.getItem('taskList');
@@ -74,83 +73,100 @@ function App(): React.ReactElement {
     localStorage.setItem('taskList', JSON.stringify(list));
   }, [list]);
 
-  function handleEdit(
-    event: React.FormEvent,
-    item: ItemType,
-    newTaskName: string,
-  ): void {
-    event.preventDefault();
+  const handleEdit = useCallback(
+    (event: React.FormEvent, item: ItemType, newTaskName: string): void => {
+      event.preventDefault();
 
-    const newList = [...filterList];
-    const filterListIndex = newList.indexOf(item);
-    newList[filterListIndex] = { ...item };
-    newList[filterListIndex].task = newTaskName;
-    setFilterList(newList);
+      setFilterList((prevFilterList) => {
+        const newList = [...prevFilterList];
+        const filterListIndex = newList.indexOf(item);
+        newList[filterListIndex] = { ...item };
+        newList[filterListIndex].task = newTaskName;
+        return newList;
+      });
 
-    const newOriginalList = [...list];
-    const originalListIndex = newOriginalList.indexOf(item);
-    newOriginalList[originalListIndex] = { ...item };
-    newOriginalList[originalListIndex].task = newTaskName;
-    setList(newOriginalList);
-  }
+      setList((prevList) => {
+        const newList = [...prevList];
+        const listIndex = newList.indexOf(item);
+        newList[listIndex] = { ...item };
+        newList[listIndex].task = newTaskName;
+        return newList;
+      });
+    },
+    [],
+  );
 
-  function handleAdd(event: React.FormEvent, item: string): void {
-    event.preventDefault();
-    const newList = [
-      ...list,
-      {
-        id: uuid.v4(),
-        task: item,
-        status: 'In Progress',
-        date: new Date(),
-        done: false,
-      },
-    ];
-    setList(newList);
+  const handleAdd = useCallback(
+    (event: React.FormEvent, item: string): void => {
+      event.preventDefault();
 
-    const newFilteredList = [
-      ...filterList,
-      {
-        id: uuid.v4(),
-        task: item,
-        status: 'In Progress',
-        date: new Date(),
-        done: false,
-      },
-    ];
+      setList((prevList) => {
+        return [
+          ...prevList,
+          {
+            id: uuid.v4(),
+            task: item,
+            status: 'In Progress',
+            date: new Date(),
+            done: false,
+          },
+        ];
+      });
 
-    setFilterList(newFilteredList);
+      setFilterList((prevFilterList) => {
+        return [
+          ...prevFilterList,
+          {
+            id: uuid.v4(),
+            task: item,
+            status: 'In Progress',
+            date: new Date(),
+            done: false,
+          },
+        ];
+      });
 
-    setTask('');
-  }
+      setTask('');
+    },
+    [],
+  );
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
-    setTask(event.target.value);
-  }
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>): void => {
+      setTask(event.target.value);
+    },
+    [],
+  );
 
-  function handleDelete(taskId: string): void {
-    const newFilterList = filterList.filter((i) => i.id !== taskId);
-    setFilterList(newFilterList);
+  const handleDelete = useCallback((taskId: string): void => {
+    setFilterList((prevFilterList) => {
+      return prevFilterList.filter((i) => i.id !== taskId);
+    });
 
-    const newList = list.filter((i) => i.id !== taskId);
-    setList(newList);
-  }
+    setList((prevList) => {
+      return prevList.filter((i) => i.id !== taskId);
+    });
+  }, []);
 
-  function handleDone(item: ItemType): void {
-    const newList = [...filterList];
-    const filterListIndex = newList.indexOf(item);
-    newList[filterListIndex] = { ...item };
-    newList[filterListIndex].done = true;
-    newList[filterListIndex].status = 'Complete';
-    setFilterList(newList);
+  const handleDone = useCallback((item: ItemType): void => {
+    setFilterList((prevFilterList) => {
+      const newList = [...prevFilterList];
+      const filterListIndex = newList.indexOf(item);
+      newList[filterListIndex] = { ...item };
+      newList[filterListIndex].done = true;
+      newList[filterListIndex].status = 'Complete';
+      return newList;
+    });
 
-    const newOriginalList = [...list];
-    const originalListIndex = newOriginalList.indexOf(item);
-    newOriginalList[originalListIndex] = { ...item };
-    newOriginalList[originalListIndex].done = true;
-    newOriginalList[originalListIndex].status = 'Complete';
-    setList(newOriginalList);
-  }
+    setList((prevList) => {
+      const newList = [...prevList];
+      const listIndex = newList.indexOf(item);
+      newList[listIndex] = { ...item };
+      newList[listIndex].done = true;
+      newList[listIndex].status = 'Complete';
+      return newList;
+    });
+  }, []);
 
   function compare(a: ItemType, b: ItemType): number {
     if (a.task < b.task) {
@@ -172,17 +188,19 @@ function App(): React.ReactElement {
     return 0;
   }
 
-  function handleSort(): void {
-    const newlist = [...filterList];
-    if (!isSorted) {
-      newlist.sort(compare);
-      isSorted = true;
-    } else {
-      newlist.sort(reverseCompare);
-      isSorted = false;
-    }
-    setFilterList(newlist);
-  }
+  const handleSort = useCallback((): void => {
+    setFilterList((prevFilterList) => {
+      const newlist = [...prevFilterList];
+      if (!isSorted) {
+        newlist.sort(compare);
+        setSorted(true);
+      } else {
+        newlist.sort(reverseCompare);
+        setSorted(false);
+      }
+      return newlist;
+    });
+  }, [isSorted]);
 
   function showTodoPage(): void {
     const page = 'Todo';

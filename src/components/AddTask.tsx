@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 
@@ -78,4 +78,4 @@ function AddTask({
   );
 }
 
-export default AddTask;
+export default memo(AddTask);

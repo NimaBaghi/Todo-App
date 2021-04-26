@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import Popup from 'reactjs-popup';
 import type { ItemType } from '../App';
 import 'reactjs-popup/dist/index.css';
@@ -189,4 +189,4 @@ function Item({
   );
 }
 
-export default Item;
+export default memo(Item);

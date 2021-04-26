@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Item from './Item';
 import type { ItemType } from '../App';
 
@@ -35,4 +35,4 @@ function DoneTasks({
   );
 }
 
-export default DoneTasks;
+export default memo(DoneTasks);
